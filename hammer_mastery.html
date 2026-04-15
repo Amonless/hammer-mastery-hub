@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hammer++ Mastery Toolset</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500&display=swap');
+
+:root {
+  --bg-void: #0d0d0f;
+  --bg-deep: #111214;
+  --bg-panel: #161719;
+  --bg-card: #1c1e21;
+  --bg-hover: #222428;
+  --bg-active: #252729;
+  --border: #2a2c30;
+  --border-bright: #363a40;
+  --accent: #e8670a;
+  --accent-hot: #ff7b1a;
+  --accent-dim: #7a3505;
+  --accent-glow: rgba(232,103,10,0.15);
+  --accent-glow-strong: rgba(232,103,10,0.35);
+  --text-primary: #d4d6db;
+  --text-secondary: #888c96;
+  --text-dim: #555960;
+  --text-code: #b8cce0;
+  --green: #4caf6f;
+  --red: #e05252;
+  --yellow: #d4a017;
+  --blue: #4a9eff;
+  --cyan: #38c4c4;
+  --font-mono: 'Share Tech Mono', monospace;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRID TEXTURE BACKGROUND */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(232,103,10,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,103,10,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* HEADER */
+header {
+  position: relative;
+  z-index: 10;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 56px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  clip-path: polygon(0 25%, 50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  animation: pulse-logo 3s ease-in-out infinite;
+}
+
+@keyframes pulse-logo {
+  0%, 100% { box-shadow: 0 0 8px var(--accent-glow-strong); }
+  50% { box-shadow: 0 0 20px var(--accent-glow-strong); }
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.logo-text span { color: var(--accent); }
+
+.header-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  margin-left: auto;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--green);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* TABS */
+.tabs-bar {
+  position: relative;
+  z-index: 10;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 0 8px;
+}
+.tabs-bar::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  flex-shrink: 0;
+  padding: 0 18px;
+  height: 44px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.tab-btn:hover { color: var(--text-primary); background: var(--bg-hover); }
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.tab-icon { font-size: 14px; }
+
+/* MAIN CONTENT */
+main {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 20px;
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* SECTION HEADER */
+.section-header {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.section-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent-dim);
+  padding: 2px 8px;
+  letter-spacing: 1px;
+}
+
+/* GRID LAYOUTS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.grid-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+/* PANELS */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  padding: 20px;
+  position: relative;
+}
+
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: var(--border-bright);
+}
+
+.panel.accent-left::before { background: var(--accent); }
+
+.panel-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* INPUTS */
+label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+input[type=text],
+input[type=number],
+select,
+textarea {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.2s;
+  appearance: none;
+}
+
+input[type=text]:focus,
+input[type=number]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+}
+
+textarea { resize: vertical; min-height: 100px; }
+
+.form-row { margin-bottom: 12px; }
+.form-inline { display: flex; gap: 8px; }
+.form-inline > * { flex: 1; }
+
+/* BUTTONS */
+.btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent-hot);
+  color: #000;
+  font-weight: 900;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hot);
+  color: #000;
+  box-shadow: 0 0 20px var(--accent-glow-strong);
+}
+
+.btn-sm { padding: 5px 12px; font-size: 11px; }
+.btn-danger { border-color: var(--red); color: var(--red); }
+.btn-danger:hover { background: rgba(224,82,82,0.1); }
+.btn-success { border-color: var(--green); color: var(--green); }
+.btn-success:hover { background: rgba(76,175,111,0.1); }
+
+/* CODE OUTPUT */
+.code-output {
+  background: #0a0c0e;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-code);
+  padding: 14px;
+  overflow-x: auto;
+  white-space: pre;
+  min-height: 80px;
+  max-height: 400px;
+  overflow-y: auto;
+  line-height: 1.6;
+}
+
+.code-output::-webkit-scrollbar { width: 6px; height: 6px; }
+.code-output::-webkit-scrollbar-track { background: var(--bg-void); }
+.code-output::-webkit-scrollbar-thumb { background: var(--border-bright); }
+
+/* SLIDER */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border-bright);
+  outline: none;
+  padding: 0;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent);
+  cursor: pointer;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+}
+
+/* TAGS / BADGES */
+.badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 2px 7px;
+  text-transform: uppercase;
+}
+
+.badge-error { background: rgba(224,82,82,0.15); color: var(--red); border: 1px solid rgba(224,82,82,0.3); }
+.badge-warn { background: rgba(212,160,23,0.15); color: var(--yellow); border: 1px solid rgba(212,160,23,0.3); }
+.badge-ok { background: rgba(76,175,111,0.15); color: var(--green); border: 1px solid rgba(76,175,111,0.3); }
+.badge-info { background: rgba(74,158,255,0.15); color: var(--blue); border: 1px solid rgba(74,158,255,0.3); }
+
+/* LOG ITEMS */
+.log-list { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; padding-right: 4px; }
+.log-list::-webkit-scrollbar { width: 4px; }
+.log-list::-webkit-scrollbar-thumb { background: var(--border-bright); }
+
+.log-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--bg-card);
+  border-left: 3px solid var(--border-bright);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  animation: slide-in 0.2s ease;
+}
+
+@keyframes slide-in { from { opacity:0; transform: translateX(-8px); } to { opacity:1; transform: none; } }
+
+.log-item.error { border-left-color: var(--red); background: rgba(224,82,82,0.05); color: #e8a0a0; }
+.log-item.warn { border-left-color: var(--yellow); background: rgba(212,160,23,0.05); }
+.log-item.ok { border-left-color: var(--green); background: rgba(76,175,111,0.05); }
+.log-item.info { border-left-color: var(--blue); }
+
+.log-line { font-size: 10px; color: var(--text-dim); flex-shrink: 0; }
+.log-msg { flex: 1; line-height: 1.5; }
+
+/* CHECKLIST */
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.check-item:hover { border-color: var(--border-bright); }
+.check-item.done { opacity: 0.5; }
+.check-item.done .check-box { background: var(--green); border-color: var(--green); }
+
+.check-box {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-bright);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #000;
+  transition: all 0.15s;
+}
+
+.check-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+}
+
+.check-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.check-item .badge { margin-left: auto; flex-shrink: 0; }
+
+/* IO NODES */
+.io-canvas {
+  background: #0a0c0e;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  height: 300px;
+}
+
+.io-node {
+  position: absolute;
+  background: var(--bg-card);
+  border: 1px solid var(--border-bright);
+  padding: 10px 14px;
+  min-width: 140px;
+  cursor: grab;
+  user-select: none;
+  z-index: 2;
+}
+
+.io-node.selected { border-color: var(--accent); box-shadow: 0 0 12px var(--accent-glow); }
+.io-node-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.io-port {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  padding: 2px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.io-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  flex-shrink: 0;
+}
+
+.io-dot.out { border-color: var(--cyan); }
+
+/* COLOR SWATCH */
+.color-swatch {
+  width: 100%;
+  height: 60px;
+  border: 1px solid var(--border);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.swatch-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+
+.preset-swatch {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: transform 0.15s;
+  position: relative;
+}
+
+.preset-swatch:hover { transform: scale(1.15); border-color: var(--accent); z-index: 1; }
+
+/* STATS ROW */
+.stats-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-box {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-num {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* RANGE DISPLAY */
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range-val {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* SEPARATOR */
+.sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+
+/* COPY FLASH */
+@keyframes copy-flash {
+  0% { background: var(--accent-glow-strong); }
+  100% { background: transparent; }
+}
+.copy-flash { animation: copy-flash 0.4s ease; }
+
+/* TOOLTIP */
+[title] { position: relative; }
+
+/* SCROLLBAR GLOBAL */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-void); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+
+select option { background: var(--bg-card); }
+
+.mt8 { margin-top: 8px; }
+.mt12 { margin-top: 12px; }
+.mt16 { margin-top: 16px; }
+.flex { display: flex; }
+.gap8 { gap: 8px; }
+.gap12 { gap: 12px; }
+.items-center { align-items: center; }
+.ml-auto { margin-left: auto; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <div class="logo-text">HAMMER<span>++</span> MASTERY</div>
+  </div>
+  <div class="header-sub">SOURCE ENGINE ENGINEERING TOOLSET v2.0</div>
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    SYSTEM READY
+  </div>
+</header>
+
+<div class="tabs-bar" id="tabsBar">
+  <button class="tab-btn active" data-tab="geometry"><span class="tab-icon">⬡</span> Geometry</button>
+  <button class="tab-btn" data-tab="logic"><span class="tab-icon">⟳</span> Logic & VScript</button>
+  <button class="tab-btn" data-tab="material"><span class="tab-icon">◈</span> Material Suite</button>
+  <button class="tab-btn" data-tab="soundscape"><span class="tab-icon">♪</span> Soundscape</button>
+  <button class="tab-btn" data-tab="lighting"><span class="tab-icon">☀</span> Lighting</button>
+  <button class="tab-btn" data-tab="optimizer"><span class="tab-icon">⚡</span> Optimizer</button>
+  <button class="tab-btn" data-tab="prefab"><span class="tab-icon">⊞</span> Prefab Clipboard</button>
+</div>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 1: GEOMETRY                                     -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tab-panel active" id="tab-geometry">
+  <div class="section-header">
+    <div class="section-title">Geometry & VMF Core</div>
+    <div class="section-badge">BRUSH GENERATOR</div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="panel accent-left">
+        <div class="panel-title">⬡ Shape Parameters</div>
+
+        <div class="form-row">
+          <label>Brush Type</label>
+          <select id="brushType" onchange="updateGeomUI()">
+            <option value="cylinder">Cylinder</option>
+            <option value="arch">Arch (Tunnel)</option>
+            <option value="box">Box (Cuboid)</option>
+            <option value="wedge">Wedge</option>
+          </select>
+        </div>
+
+        <div id="commonParams">
+          <div class="form-inline">
+            <div class="form-row">
+              <label>Origin X</label>
+              <input type="number" id="originX" value="0">
+            </div>
+            <div class="form-row">
+              <label>Origin Y</label>
+              <input type="number" id="originY" value="0">
+            </div>
+            <div class="form-row">
+              <label>Origin Z</label>
+              <input type="number" id="originZ" value="0">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Grid Snap</label>
+            <select id="gridSnap">
+              <option value="1">1 unit</option>
+              <option value="2">2 units</option>
+              <option value="4">4 units</option>
+              <option value="8" selected>8 units</option>
+              <option value="16">16 units</option>
+              <option value="32">32 units</option>
+              <option value="64">64 units</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Cylinder -->
+        <div id="cylinderParams">
+          <div class="form-inline">
+            <div class="form-row">
+              <label>Radius</label>
+              <input type="number" id="cylRadius" value="64" min="8">
+            </div>
+            <div class="form-row">
+              <label>Height</label>
+              <input type="number" id="cylHeight" value="128" min="8">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Sides (4-32)</label>
+            <div class="range-row">
+              <input type="range" id="cylSides" min="4" max="32" value="8" oninput="document.getElementById('cylSidesVal').textContent=this.value">
+              <div class="range-val" id="cylSidesVal">8</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Arch -->
+        <div id="archParams" style="display:none">
+          <div class="form-inline">
+            <div class="form-row">
+              <label>Outer Radius</label>
+              <input type="number" id="archOuterR" value="128" min="16">
+            </div>
+            <div class="form-row">
+              <label>Inner Radius</label>
+              <input type="number" id="archInnerR" value="96" min="8">
+            </div>
+          </div>
+          <div class="form-inline">
+            <div class="form-row">
+              <label>Arc Angle (°)</label>
+              <input type="number" id="archAngle" value="180" min="30" max="360">
+            </div>
+            <div class="form-row">
+              <label>Segments</label>
+              <input type="number" id="archSegs" value="8" min="3" max="24">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Height</label>
+            <input type="number" id="archHeight" value="32" min="8">
+          </div>
+        </div>
+
+        <!-- Box -->
+        <div id="boxParams" style="display:none">
+          <div class="form-inline">
+            <div class="form-row">
+              <label>Width (X)</label>
+              <input type="number" id="boxW" value="128" min="2">
+            </div>
+            <div class="form-row">
+              <label>Depth (Y)</label>
+              <input type="number" id="boxD" value="128" min="2">
+            </div>
+            <div class="form-row">
+              <label>Height (Z)</label>
+              <input type="number" id="boxH" value="128" min="2">
+            </div>
+          </div>
+        </div>
+
+        <!-- Wedge -->
+        <div id="wedgeParams" style="display:none">
+          <div class="form-inline">
+            <div class="form-row">
+              <label>Width</label>
+              <input type="number" id="wedgeW" value="128" min="2">
+            </div>
+            <div class="form-row">
+              <label>Depth</label>
+              <input type="number" id="wedgeD" value="128" min="2">
+            </div>
+            <div class="form-row">
+              <label>Height</label>
+              <input type="number" id="wedgeH" value="128" min="2">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row mt12">
+          <label>Texture</label>
+          <input type="text" id="brushTexture" value="tools/toolsnodraw">
+        </div>
+
+        <div class="mt12 flex gap8">
+          <button class="btn btn-primary" onclick="generateVMF()">⬡ Generate VMF</button>
+          <button class="btn" onclick="previewGeometry()">◉ Preview</button>
+        </div>
+      </div>
+
+      <!-- Canvas Preview -->
+      <div class="panel mt12" style="padding:0;overflow:hidden;">
+        <div class="panel-title" style="padding:12px 16px;padding-bottom:0;">◉ 2D Preview (Top View)</div>
+        <canvas id="geomCanvas" width="500" height="200" style="width:100%;display:block;background:#0a0c0e;"></canvas>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel accent-left" style="height:100%;">
+        <div class="panel-title" style="justify-content:space-between;">
+          ▣ VMF Output
+          <div class="flex gap8">
+            <button class="btn btn-sm btn-success" onclick="copyVMF()">⎘ Copy</button>
+            <button class="btn btn-sm" onclick="downloadVMF()">↓ .VMF</button>
+          </div>
+        </div>
+        <div class="code-output" id="vmfOutput" style="max-height:520px;"># Click "Generate VMF" to produce brush code
+# Output will be VMF-compatible solid data
+# Ready for direct paste into Hammer++</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 2: LOGIC & VSCRIPT                              -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-logic">
+  <div class="section-header">
+    <div class="section-title">Logic & VScript Bridge</div>
+    <div class="section-badge">I/O VISUALIZER</div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="panel accent-left">
+        <div class="panel-title">⟳ I/O Connection Builder</div>
+        <div class="form-row">
+          <label>Source Entity</label>
+          <input type="text" id="ioSource" value="trigger_once_01" placeholder="e.g. button_01">
+        </div>
+        <div class="form-row">
+          <label>Output Event</label>
+          <select id="ioOutput">
+            <option>OnStartTouch</option>
+            <option>OnEndTouch</option>
+            <option>OnTrigger</option>
+            <option>OnPressed</option>
+            <option>OnIn</option>
+            <option>OnOut</option>
+            <option>OnUser1</option>
+            <option>OnUser2</option>
+            <option>OnDeath</option>
+            <option>OnHealthChanged</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Target Entity</label>
+          <input type="text" id="ioTarget" value="door_01" placeholder="e.g. prop_door_01">
+        </div>
+        <div class="form-row">
+          <label>Input Action</label>
+          <select id="ioAction">
+            <option>Open</option>
+            <option>Close</option>
+            <option>Toggle</option>
+            <option>Kill</option>
+            <option>Enable</option>
+            <option>Disable</option>
+            <option>FireUser1</option>
+            <option>FireUser2</option>
+            <option>TurnOn</option>
+            <option>TurnOff</option>
+            <option>SetAnimation</option>
+            <option>PlaySound</option>
+          </select>
+        </div>
+        <div class="form-inline">
+          <div class="form-row">
+            <label>Parameter</label>
+            <input type="text" id="ioParam" value="" placeholder="(optional)">
+          </div>
+          <div class="form-row">
+            <label>Delay (s)</label>
+            <input type="number" id="ioDelay" value="0" min="0" step="0.1">
+          </div>
+          <div class="form-row">
+            <label>Repeat (-1=∞)</label>
+            <input type="number" id="ioRepeat" value="-1" min="-1">
+          </div>
+        </div>
+        <button class="btn btn-primary mt8" onclick="addIOConnection()">+ Add Connection</button>
+      </div>
+
+      <div class="panel mt12">
+        <div class="panel-title">◎ Active Connections</div>
+        <div id="ioList" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel accent-left" style="margin-bottom:16px;">
+        <div class="panel-title">⟁ VScript Template Generator</div>
+        <div class="form-row">
+          <label>Template Type</label>
+          <select id="vscriptType" onchange="generateVScript()">
+            <option value="timer">Timer (think function)</option>
+            <option value="trigger">Trigger Handler</option>
+            <option value="prop_manip">Prop Manipulation</option>
+            <option value="io_fire">Fire I/O from Script</option>
+            <option value="player_check">Player Distance Check</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>Entity Name</label>
+          <input type="text" id="vscriptEntity" value="logic_script_01" oninput="generateVScript()">
+        </div>
+        <div class="form-row">
+          <label>Interval / Parameter</label>
+          <input type="number" id="vscriptParam" value="2.5" step="0.1" oninput="generateVScript()">
+        </div>
+        <button class="btn btn-sm btn-success mt8" onclick="copyVScript()">⎘ Copy Script</button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">◳ VScript Output</div>
+        <div class="code-output" id="vscriptOutput" style="max-height:300px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 3: MATERIAL SUITE                               -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-material">
+  <div class="section-header">
+    <div class="section-title">VMT Validator</div>
+    <div class="section-badge">MATERIAL PARSER</div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="panel accent-left">
+        <div class="panel-title">◈ VMT Input</div>
+        <div class="form-row">
+          <label>Paste VMT Content</label>
+          <textarea id="vmtInput" style="min-height:260px;font-size:11px;">"LightmappedGeneric"
+{
+    "$basetexture" "brick/brickwall026a"
+    "$bumpmap" "brick/brickwall026a_normal"
+    "$surfaceprop" "brick"
+    "$alphatest" "1"
+    "$translucent" "1"
+    "$envmap" "env_cubemap"
+    "$phong" "1"
+    "$phongexponent" "256"
+    "$selfillum" "1"
+    "$selfillumtint" "[1 0.8 0.4]"
+}</textarea>
+        </div>
+        <div class="flex gap8 mt8">
+          <button class="btn btn-primary" onclick="validateVMT()">◈ Validate VMT</button>
+          <button class="btn" onclick="clearVMT()">✕ Clear</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel accent-left">
+        <div class="panel-title">⚠ Validation Report</div>
+        <div id="vmtStats" class="stats-row" style="margin-bottom:12px;">
+          <div class="stat-box"><div class="stat-num" id="vmtErrCount">—</div><div class="stat-label">Errors</div></div>
+          <div class="stat-box"><div class="stat-num" id="vmtWarnCount">—</div><div class="stat-label">Warnings</div></div>
+          <div class="stat-box"><div class="stat-num" id="vmtInfoCount">—</div><div class="stat-label">Info</div></div>
+        </div>
+        <div class="log-list" id="vmtReport">
+          <div class="log-item info"><div class="log-msg">Paste a VMT file and click Validate</div></div>
+        </div>
+      </div>
+      <div class="panel mt12">
+        <div class="panel-title">◈ VMT Quick Templates</div>
+        <div class="flex gap8" style="flex-wrap:wrap;">
+          <button class="btn btn-sm" onclick="loadVMTTemplate('basic')">Basic Diffuse</button>
+          <button class="btn btn-sm" onclick="loadVMTTemplate('phong')">Phong Metal</button>
+          <button class="btn btn-sm" onclick="loadVMTTemplate('glass')">Glass</button>
+          <button class="btn btn-sm" onclick="loadVMTTemplate('glow')">Selfillum Glow</button>
+          <button class="btn btn-sm" onclick="loadVMTTemplate('decal')">Decal</button>
+          <button class="btn btn-sm" onclick="loadVMTTemplate('water')">Water</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 4: SOUNDSCAPE                                   -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-soundscape">
+  <div class="section-header">
+    <div class="section-title">Soundscape Builder</div>
+    <div class="section-badge">AMBIENT AUDIO</div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="panel accent-left">
+        <div class="panel-title">♪ Soundscape Entry</div>
+        <div class="form-row">
+          <label>Soundscape Name</label>
+          <input type="text" id="ssName" value="outdoor.city.day" placeholder="e.g. indoor.factory.loud">
+        </div>
+        <div class="form-row">
+          <label>dsp_space Preset</label>
+          <select id="ssDsp">
+            <option value="0">0 - No DSP</option>
+            <option value="1">1 - Generic</option>
+            <option value="2" selected>2 - Room</option>
+            <option value="3">3 - Bathroom</option>
+            <option value="4">4 - Hallway</option>
+            <option value="5">5 - Small Closet</option>
+            <option value="6">6 - Large Room</option>
+            <option value="7">7 - Large Hall</option>
+            <option value="8">8 - Basement</option>
+            <option value="9">9 - Cave</option>
+            <option value="10">10 - Sewer Tunnel</option>
+            <option value="11">11 - Underwater</option>
+          </select>
+        </div>
+        <hr class="sep">
+        <div class="panel-title" style="font-size:12px;">+ Add Sound Layer</div>
+        <div class="form-row">
+          <label>Sound Path</label>
+          <input type="text" id="ssSound" value="ambient/city/city_ambience1.wav">
+        </div>
+        <div class="form-inline">
+          <div class="form-row">
+            <label>Volume</label>
+            <input type="number" id="ssVolume" value="0.4" min="0" max="1" step="0.05">
+          </div>
+          <div class="form-row">
+            <label>Pitch</label>
+            <input type="number" id="ssPitch" value="100" min="50" max="200">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-row">
+            <label>Min Interval</label>
+            <input type="number" id="ssMinInt" value="10" min="0">
+          </div>
+          <div class="form-row">
+            <label>Max Interval</label>
+            <input type="number" id="ssMaxInt" value="30" min="0">
+          </div>
+        </div>
+        <div class="form-inline">
+          <div class="form-row">
+            <label>Type</label>
+            <select id="ssType">
+              <option value="playrandom">playrandom</option>
+              <option value="playlooping">playlooping</option>
+              <option value="playsoundscape">playsoundscape</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Position (opt.)</label>
+            <input type="text" id="ssPos" placeholder="x y z">
+          </div>
+        </div>
+        <div class="mt8 flex gap8">
+          <button class="btn btn-primary" onclick="addSSLayer()">+ Add Layer</button>
+          <button class="btn btn-success" onclick="buildSoundscape()">♪ Build</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="panel accent-left" style="margin-bottom:16px;">
+        <div class="panel-title">◈ Sound Layers</div>
+        <div id="ssLayers" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;min-height:40px;">
+          <div class="log-item info"><div class="log-msg">No layers added yet</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title" style="justify-content:space-between;">
+          ♪ soundscapes.txt Output
+          <button class="btn btn-sm btn-success" onclick="copySoundscape()">⎘ Copy</button>
+        </div>
+        <div class="code-output" id="ssOutput" style="max-height:300px;"># soundscapes.txt output will appear here
+# Paste into scripts/soundscapes_manifest.txt</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 5: LIGHTING                                     -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-lighting">
+  <div class="section-header">
+    <div class="section-title">Color & Light Helper</div>
+    <div class="section-badge">SKY + LIGHT PRESETS</div>
+  </div>
+  <div class="grid-3">
+    <div>
+      <div class="panel accent-left">
+        <div class="panel-title">☀ Color → Source Format</div>
+        <div class="form-row">
+          <label>Pick Color</label>
+          <input type="color" id="lightColor" value="#f5c070" style="width:100%;height:44px;background:none;border:1px solid var(--border);cursor:pointer;padding:2px;" oninput="updateLightColor()">
+        </div>
+        <div class="form-row mt8">
+          <label>Intensity (0-999)</label>
+          <div class="range-row">
+            <input type="range" id="lightIntensity" min="1" max="999" value="200" oninput="updateLightColor()">
+            <div class="range-val" id="lightIntVal">200</div>
+          </div>
+        </div>
+        <div class="form-row mt8">
+          <label>Source Light Format</label>
+          <div class="code-output" id="lightOutput" style="min-height:40px;">255 200 112 200</div>
+        </div>
+        <div id="lightPreview" class="color-swatch mt8" style="background:#f5c070;"></div>
+        <div class="form-row mt12">
+          <label>sky_camera / env_sun Color (+ HDR)</label>
+          <div class="code-output" id="lightHDROutput" style="min-height:40px;">255 200 112 200 255 200 112 200</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel accent-left" style="grid-column: span 2;">
+      <div class="panel-title">◎ Skybox Light Presets</div>
+      <div class="swatch-row" id="lightPresets"></div>
+      <div class="sep"></div>
+      <div class="grid-2" id="selectedPresetInfo" style="gap:12px;">
+        <div>
+          <div class="panel-title" style="font-size:11px;">SELECTED PRESET</div>
+          <div class="code-output" id="presetOutput" style="min-height:100px;"># Click a preset above</div>
+        </div>
+        <div>
+          <div class="panel-title" style="font-size:11px;">RECOMMENDED SKYBOX</div>
+          <div class="code-output" id="presetSky" style="min-height:100px;"># Skybox name + env_sun settings</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 6: OPTIMIZER                                    -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-optimizer">
+  <div class="section-header">
+    <div class="section-title">Optimization Suite</div>
+    <div class="section-badge">LOG PARSER + ANTI-LAG</div>
+  </div>
+  <div class="grid-2">
+    <div>
+      <div class="panel accent-left">
+        <div class="panel-title">⚡ Compiler Log Parser</div>
+        <div class="form-row">
+          <label>Paste VBSP / VVIS / VRAD Log Output</label>
+          <textarea id="logInput" style="min-height:220px;font-size:11px;" placeholder="Paste compiler log output here...
+Example:
+** Executing...
+** Command: vbsp.exe
+...
+Error: Leaf portals saw into solid space
+  Leak from (100 200 300)
+  point (128 256 320)"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="parseLog()">⚡ Parse Log</button>
+      </div>
+
+      <div class="panel mt12">
+        <div class="panel-title">◎ Parse Statistics</div>
+        <div class="stats-row">
+          <div class="stat-box"><div class="stat-num" id="logErrors" style="color:var(--red);">0</div><div class="stat-label">Critical</div></div>
+          <div class="stat-box"><div class="stat-num" id="logWarns" style="color:var(--yellow);">0</div><div class="stat-label">Warnings</div></div>
+          <div class="stat-box"><div class="stat-num" id="logInfos" style="color:var(--blue);">0</div><div class="stat-label">Info</div></div>
+          <div class="stat-box"><div class="stat-num" id="logLines">0</div><div class="stat-label">Lines</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel accent-left" style="margin-bottom:16px;">
+        <div class="panel-title">⚠ Compiler Diagnostics</div>
+        <div class="log-list" id="logReport">
+          <div class="log-item info"><div class="log-msg">Paste compiler output and click Parse</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">✓ Anti-Lag Optimization Checklist</div>
+        <div class="checklist" id="antiLagList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ -->
+<!-- TAB 7: PREFAB CLIPBOARD                             -->
+<!-- ═══════════════════════════════════════════════════ -->
+<div class="tab-panel" id="tab-prefab">
+  <div class="section-header">
+    <div class="section-title">Prefab Clipboard</div>
+    <div class="section-badge">ONE-CLICK VMF COPY</div>
+  </div>
+  <div class="grid-auto" id="prefabGrid"></div>
+</div>
+
+</main>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   CORE UTILITIES
+══════════════════════════════════════════════════════ */
+let brushIdCounter = 1;
+let vmfSideCounter = 1;
+
+function snapToGrid(val, grid) {
+  return Math.round(val / grid) * grid;
+}
+
+function snapVec3(x, y, z, grid) {
+  return [snapToGrid(x, grid), snapToGrid(y, grid), snapToGrid(z, grid)];
+}
+
+function formatVec3(v) {
+  return `(${v[0]} ${v[1]} ${v[2]})`;
+}
+
+function planeFromPoints(p1, p2, p3) {
+  return `${formatVec3(p1)} ${formatVec3(p2)} ${formatVec3(p3)}`;
+}
+
+function degreesToRadians(deg) { return deg * Math.PI / 180; }
+
+function copyToClipboard(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn ? btn.textContent : '';
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = orig, 1500); }
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   VMF BUILDER — SOLID CONSTRUCTION
+══════════════════════════════════════════════════════ */
+function buildSide(plane, texture) {
+  const sid = vmfSideCounter++;
+  return `\t\tside\n\t\t{\n\t\t\t"id" "${sid}"\n\t\t\t"plane" "${plane}"\n\t\t\t"material" "${texture.toUpperCase()}"\n\t\t\t"uaxis" "[1 0 0 0] 0.25"\n\t\t\t"vaxis" "[0 -1 0 0] 0.25"\n\t\t\t"rotation" "0"\n\t\t\t"lightmapscale" "16"\n\t\t\t"smoothing_groups" "0"\n\t\t}`;
+}
+
+function buildSolid(sides, texture) {
+  const bid = brushIdCounter++;
+  const sideStr = sides.map(s => buildSide(s, texture)).join('\n');
+  return `\tsolid\n\t{\n\t\t"id" "${bid}"\n${sideStr}\n\t\tside\n\t\t{\n\t\t\t"id" "${vmfSideCounter - 1}"\n\t\t}\n\t}`;
+}
+
+function vmfHeader(solids) {
+  return `versioninfo
+{
+\t"editorversion" "400"
+\t"editorbuild" "8456"
+\t"mapversion" "1"
+\t"formatversion" "100"
+\t"prefab" "0"
+}
+visgroups {}
+viewsettings {}
+world
+{
+\t"id" "1"
+\t"mapversion" "1"
+\t"classname" "worldspawn"
+\t"skyname" "sky_day01_01"
+\t"maxpropscreenwidth" "-1"
+\t"detailvbsp" "detail.vbsp"
+\t"detailmaterial" "detail/detailsprites"
+${solids}
+}`;
+}
+
+/* ══════════════════════════════════════════════════════
+   GEOMETRY GENERATORS
+══════════════════════════════════════════════════════ */
+function updateGeomUI() {
+  const type = document.getElementById('brushType').value;
+  document.getElementById('cylinderParams').style.display = type === 'cylinder' ? '' : 'none';
+  document.getElementById('archParams').style.display = type === 'arch' ? '' : 'none';
+  document.getElementById('boxParams').style.display = type === 'box' ? '' : 'none';
+  document.getElementById('wedgeParams').style.display = type === 'wedge' ? '' : 'none';
+}
+
+function generateCylinder(ox, oy, oz, radius, height, sides, grid, texture) {
+  const solidBlocks = [];
+  const angleStep = (2 * Math.PI) / sides;
+  const comments = [`// Cylinder: r=${radius} h=${height} sides=${sides} grid=${grid}`];
+
+  // Top & Bottom caps
+  const topZ = snapToGrid(oz + height, grid);
+  const botZ = snapToGrid(oz, grid);
+
+  // Generate outer wall segments
+  for (let i = 0; i < sides; i++) {
+    const a1 = i * angleStep;
+    const a2 = (i + 1) * angleStep;
+
+    const x1 = snapToGrid(ox + Math.round(radius * Math.cos(a1)), grid);
+    const y1 = snapToGrid(oy + Math.round(radius * Math.sin(a1)), grid);
+    const x2 = snapToGrid(ox + Math.round(radius * Math.cos(a2)), grid);
+    const y2 = snapToGrid(oy + Math.round(radius * Math.sin(a2)), grid);
+
+    // Each segment: thin wedge brush
+    // Side faces: outer face, two vertical sides, top, bottom, inner
+    const outerPlane = planeFromPoints([x1, y1, botZ], [x2, y2, botZ], [x2, y2, topZ]);
+    const topPlane = planeFromPoints([x1, y1, topZ], [x2, y2, topZ], [ox, oy, topZ]);
+    const botPlane = planeFromPoints([ox, oy, botZ], [x2, y2, botZ], [x1, y1, botZ]);
+    const side1Plane = planeFromPoints([x1, y1, botZ], [x1, y1, topZ], [ox, oy, topZ]);
+    const side2Plane = planeFromPoints([x2, y2, topZ], [x2, y2, botZ], [ox, oy, botZ]);
+    const innerPlane = planeFromPoints([ox, oy, topZ], [ox, oy, botZ], [x1, y1, botZ]);
+
+    solidBlocks.push(buildSolid([outerPlane, topPlane, botPlane, side1Plane, side2Plane, innerPlane], texture));
+  }
+
+  return comments.join('\n') + '\n' + solidBlocks.join('\n');
+}
+
+function generateArch(ox, oy, oz, outerR, innerR, angleTotal, segments, height, grid, texture) {
+  const blocks = [];
+  const arcRad = degreesToRadians(angleTotal);
+  const stepRad = arcRad / segments;
+  const topZ = snapToGrid(oz + height, grid);
+  const botZ = snapToGrid(oz, grid);
+
+  blocks.push(`// Arch: outerR=${outerR} innerR=${innerR} arc=${angleTotal}° segs=${segments}`);
+
+  for (let i = 0; i < segments; i++) {
+    const a1 = i * stepRad;
+    const a2 = (i + 1) * stepRad;
+
+    const ox1 = snapToGrid(ox + Math.round(outerR * Math.cos(a1)), grid);
+    const oy1 = snapToGrid(oy + Math.round(outerR * Math.sin(a1)), grid);
+    const ox2 = snapToGrid(ox + Math.round(outerR * Math.cos(a2)), grid);
+    const oy2 = snapToGrid(oy + Math.round(outerR * Math.sin(a2)), grid);
+    const ix1 = snapToGrid(ox + Math.round(innerR * Math.cos(a1)), grid);
+    const iy1 = snapToGrid(oy + Math.round(innerR * Math.sin(a1)), grid);
+    const ix2 = snapToGrid(ox + Math.round(innerR * Math.cos(a2)), grid);
+    const iy2 = snapToGrid(oy + Math.round(innerR * Math.sin(a2)), grid);
+
+    const outerFace = planeFromPoints([ox1, oy1, botZ], [ox2, oy2, botZ], [ox2, oy2, topZ]);
+    const innerFace = planeFromPoints([ix2, iy2, botZ], [ix1, iy1, botZ], [ix1, iy1, topZ]);
+    const topFace   = planeFromPoints([ox2, oy2, topZ], [ox1, oy1, topZ], [ix1, iy1, topZ]);
+    const botFace   = planeFromPoints([ix1, iy1, botZ], [ox1, oy1, botZ], [ox2, oy2, botZ]);
+    const side1     = planeFromPoints([ox1, oy1, topZ], [ox1, oy1, botZ], [ix1, iy1, botZ]);
+    const side2     = planeFromPoints([ix2, iy2, topZ], [ox2, oy2, topZ], [ox2, oy2, botZ]);
+
+    blocks.push(buildSolid([outerFace, innerFace, topFace, botFace, side1, side2], texture));
+  }
+  return blocks.join('\n');
+}
+
+function generateBox(ox, oy, oz, w, d, h, grid, texture) {
+  const x0 = snapToGrid(ox, grid), y0 = snapToGrid(oy, grid), z0 = snapToGrid(oz, grid);
+  const x1 = snapToGrid(ox + w, grid), y1 = snapToGrid(oy + d, grid), z1 = snapToGrid(oz + h, grid);
+
+  const top    = planeFromPoints([x0,y1,z1],[x1,y1,z1],[x1,y0,z1]);
+  const bot    = planeFromPoints([x0,y0,z0],[x1,y0,z0],[x1,y1,z0]);
+  const front  = planeFromPoints([x0,y0,z1],[x1,y0,z1],[x1,y0,z0]);
+  const back   = planeFromPoints([x1,y1,z1],[x0,y1,z1],[x0,y1,z0]);
+  const left   = planeFromPoints([x0,y1,z1],[x0,y0,z1],[x0,y0,z0]);
+  const right  = planeFromPoints([x1,y0,z1],[x1,y1,z1],[x1,y1,z0]);
+
+  return `// Box: ${w}x${d}x${h} @ (${x0},${y0},${z0})\n` + buildSolid([top,bot,front,back,left,right], texture);
+}
+
+function generateWedge(ox, oy, oz, w, d, h, grid, texture) {
+  const x0 = snapToGrid(ox, grid), y0 = snapToGrid(oy, grid), z0 = snapToGrid(oz, grid);
+  const x1 = snapToGrid(ox + w, grid), y1 = snapToGrid(oy + d, grid), z1 = snapToGrid(oz + h, grid);
+
+  const bot    = planeFromPoints([x0,y0,z0],[x1,y0,z0],[x1,y1,z0]);
+  const front  = planeFromPoints([x0,y0,z1],[x1,y0,z1],[x1,y0,z0]);
+  const back   = planeFromPoints([x1,y1,z0],[x0,y1,z0],[x0,y1,z1]);  // note: wedge collapses here
+  const left   = planeFromPoints([x0,y0,z0],[x0,y1,z0],[x0,y1,z1]);
+  const right  = planeFromPoints([x1,y0,z1],[x1,y0,z0],[x1,y1,z0]);
+  const slope  = planeFromPoints([x0,y1,z1],[x1,y1,z1],[x1,y0,z1]);  // diagonal top
+
+  return `// Wedge: ${w}x${d}x${h}\n` + buildSolid([bot,front,back,left,right,slope], texture);
+}
+
+function generateVMF() {
+  const type = document.getElementById('brushType').value;
+  const grid = parseInt(document.getElementById('gridSnap').value);
+  const tex = document.getElementById('brushTexture').value || 'tools/toolsnodraw';
+  const ox = parseInt(document.getElementById('originX').value) || 0;
+  const oy = parseInt(document.getElementById('originY').value) || 0;
+  const oz = parseInt(document.getElementById('originZ').value) || 0;
+
+  brushIdCounter = 2; vmfSideCounter = 1;
+  let solids = '';
+
+  if (type === 'cylinder') {
+    const r = parseInt(document.getElementById('cylRadius').value) || 64;
+    const h = parseInt(document.getElementById('cylHeight').value) || 128;
+    const s = parseInt(document.getElementById('cylSides').value) || 8;
+    solids = generateCylinder(ox, oy, oz, r, h, s, grid, tex);
+  } else if (type === 'arch') {
+    const or = parseInt(document.getElementById('archOuterR').value) || 128;
+    const ir = parseInt(document.getElementById('archInnerR').value) || 96;
+    const ang = parseInt(document.getElementById('archAngle').value) || 180;
+    const seg = parseInt(document.getElementById('archSegs').value) || 8;
+    const h = parseInt(document.getElementById('archHeight').value) || 32;
+    solids = generateArch(ox, oy, oz, or, ir, ang, seg, h, grid, tex);
+  } else if (type === 'box') {
+    const w = parseInt(document.getElementById('boxW').value) || 128;
+    const d = parseInt(document.getElementById('boxD').value) || 128;
+    const h = parseInt(document.getElementById('boxH').value) || 128;
+    solids = generateBox(ox, oy, oz, w, d, h, grid, tex);
+  } else if (type === 'wedge') {
+    const w = parseInt(document.getElementById('wedgeW').value) || 128;
+    const d = parseInt(document.getElementById('wedgeD').value) || 128;
+    const h = parseInt(document.getElementById('wedgeH').value) || 128;
+    solids = generateWedge(ox, oy, oz, w, d, h, grid, tex);
+  }
+
+  const full = vmfHeader(solids);
+  document.getElementById('vmfOutput').textContent = full;
+  previewGeometry();
+}
+
+function copyVMF() {
+  const text = document.getElementById('vmfOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const out = document.getElementById('vmfOutput');
+    out.style.borderLeftColor = 'var(--green)';
+    setTimeout(() => out.style.borderLeftColor = 'var(--accent)', 800);
+  });
+}
+
+function downloadVMF() {
+  const text = document.getElementById('vmfOutput').textContent;
+  const blob = new Blob([text], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'generated_brush.vmf';
+  a.click();
+}
+
+/* ══════════════════════════════════════════════════════
+   CANVAS PREVIEW
+══════════════════════════════════════════════════════ */
+function previewGeometry() {
+  const canvas = document.getElementById('geomCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+
+  const cx = W/2, cy = H/2;
+  const type = document.getElementById('brushType').value;
+  const grid = parseInt(document.getElementById('gridSnap').value);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(232,103,10,0.08)';
+  ctx.lineWidth = 0.5;
+  const gridPx = 16;
+  for (let x = 0; x < W; x += gridPx) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+  for (let y = 0; y < H; y += gridPx) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+  // Axes
+  ctx.strokeStyle = 'rgba(232,103,10,0.2)';
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0,cy); ctx.lineTo(W,cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx,0); ctx.lineTo(cx,H); ctx.stroke();
+
+  const scale = 0.5;
+
+  ctx.strokeStyle = '#e8670a';
+  ctx.fillStyle = 'rgba(232,103,10,0.15)';
+  ctx.lineWidth = 1.5;
+
+  if (type === 'cylinder') {
+    const r = parseInt(document.getElementById('cylRadius').value) || 64;
+    const sides = parseInt(document.getElementById('cylSides').value) || 8;
+    ctx.beginPath();
+    for (let i = 0; i <= sides; i++) {
+      const a = (i / sides) * 2 * Math.PI;
+      const x = cx + r * scale * Math.cos(a);
+      const y = cy + r * scale * Math.sin(a);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    // Snap points
+    ctx.fillStyle = 'var(--accent)';
+    for (let i = 0; i < sides; i++) {
+      const a = (i / sides) * 2 * Math.PI;
+      const rx = snapToGrid(Math.round(r * Math.cos(a)), grid) * scale;
+      const ry = snapToGrid(Math.round(r * Math.sin(a)), grid) * scale;
+      ctx.beginPath(); ctx.arc(cx+rx, cy+ry, 3, 0, Math.PI*2); ctx.fill();
+    }
+
+  } else if (type === 'arch') {
+    const or = parseInt(document.getElementById('archOuterR').value) || 128;
+    const ir = parseInt(document.getElementById('archInnerR').value) || 96;
+    const ang = parseInt(document.getElementById('archAngle').value) || 180;
+    const segs = parseInt(document.getElementById('archSegs').value) || 8;
+    const arcRad = degreesToRadians(ang);
+    const step = arcRad / segs;
+
+    ctx.beginPath();
+    for (let i = 0; i <= segs; i++) {
+      const a = i * step;
+      ctx.lineTo(cx + or * scale * Math.cos(a), cy + or * scale * Math.sin(a));
+    }
+    for (let i = segs; i >= 0; i--) {
+      const a = i * step;
+      ctx.lineTo(cx + ir * scale * Math.cos(a), cy + ir * scale * Math.sin(a));
+    }
+    ctx.closePath(); ctx.fill(); ctx.stroke();
+
+  } else if (type === 'box') {
+    const w = parseInt(document.getElementById('boxW').value) || 128;
+    const d = parseInt(document.getElementById('boxD').value) || 128;
+    ctx.strokeRect(cx - w*scale/2, cy - d*scale/2, w*scale, d*scale);
+    ctx.fillRect(cx - w*scale/2, cy - d*scale/2, w*scale, d*scale);
+
+  } else if (type === 'wedge') {
+    const w = parseInt(document.getElementById('wedgeW').value) || 128;
+    const d = parseInt(document.getElementById('wedgeD').value) || 128;
+    ctx.beginPath();
+    ctx.moveTo(cx - w*scale/2, cy + d*scale/2);
+    ctx.lineTo(cx + w*scale/2, cy + d*scale/2);
+    ctx.lineTo(cx + w*scale/2, cy - d*scale/2);
+    ctx.closePath();
+    ctx.fill(); ctx.stroke();
+  }
+
+  ctx.fillStyle = '#e8670a';
+  ctx.font = '10px Share Tech Mono';
+  ctx.fillText('TOP VIEW (XY)', 8, 16);
+  ctx.fillStyle = 'rgba(232,103,10,0.5)';
+  ctx.fillText(`GRID: ${grid}u`, 8, 30);
+}
+
+/* ══════════════════════════════════════════════════════
+   I/O VISUALIZER
+══════════════════════════════════════════════════════ */
+let ioConnections = [];
+
+function addIOConnection() {
+  const conn = {
+    source: document.getElementById('ioSource').value,
+    output: document.getElementById('ioOutput').value,
+    target: document.getElementById('ioTarget').value,
+    action: document.getElementById('ioAction').value,
+    param: document.getElementById('ioParam').value,
+    delay: document.getElementById('ioDelay').value,
+    repeat: document.getElementById('ioRepeat').value,
+  };
+  ioConnections.push(conn);
+  renderIOList();
+}
+
+function renderIOList() {
+  const list = document.getElementById('ioList');
+  if (!ioConnections.length) {
+    list.innerHTML = '<div class="log-item info"><div class="log-msg">No connections yet</div></div>';
+    return;
+  }
+  list.innerHTML = ioConnections.map((c, i) => `
+    <div class="log-item" style="border-left-color:var(--cyan);">
+      <div class="log-msg">
+        <span style="color:var(--accent)">${c.source}</span>
+        <span style="color:var(--text-dim)"> → </span>
+        <span style="color:var(--cyan)">${c.output}</span>
+        <span style="color:var(--text-dim)"> → </span>
+        <span style="color:var(--green)">${c.target}:${c.action}</span>
+        ${c.delay > 0 ? `<span style="color:var(--text-dim)"> [delay:${c.delay}s]</span>` : ''}
+        ${c.repeat != -1 ? `<span style="color:var(--text-dim)"> [x${c.repeat}]</span>` : ''}
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="removeIO(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeIO(i) { ioConnections.splice(i, 1); renderIOList(); }
+
+/* ══════════════════════════════════════════════════════
+   VSCRIPT GENERATOR
+══════════════════════════════════════════════════════ */
+const VSCRIPT_TEMPLATES = {
+  timer: (entity, interval) => `// ╔══════════════════════════════════╗
+// ║  VScript Timer — Think Function  ║
+// ╚══════════════════════════════════╝
+// Entity: ${entity}  Interval: ${interval}s
+
+local INTERVAL <- ${interval}
+
+function OnPostSpawn() {
+    // Schedule first think
+    self.SetThink(OnThink, "MainThink", INTERVAL)
+    printl("[${entity}] Timer initialized, interval=" + INTERVAL + "s")
+}
+
+function OnThink() {
+    // ── Your logic here ──────────────
+    local t = Time()
+    printl("[${entity}] Think fired at t=" + t)
+    
+    // Example: toggle a light
+    // local light = Entities.FindByName(null, "light_01")
+    // if (light != null) light.AcceptInput("Toggle", "", null, null)
+    
+    // ─────────────────────────────────
+    return INTERVAL  // reschedule
+}`,
+
+  trigger: (entity, _) => `// ╔══════════════════════════════════╗
+// ║  VScript Trigger Handler          ║
+// ╚══════════════════════════════════╝
+// Attach to: trigger_multiple or logic_script on ${entity}
+
+function OnStartTouch(activator) {
+    if (activator == null) return
+    
+    local name = activator.GetName()
+    local cls  = activator.GetClassname()
+    printl("[${entity}] StartTouch: " + cls + " / " + name)
+    
+    // Only react to players
+    if (!activator.IsPlayer()) return
+    
+    // Fire output to target
+    self.ConnectOutput("OnUser1", "target_entity", "Enable", "", 0)
+    EntFireByHandle(activator, "RunScriptCode", "", 0.0, null, null)
+}
+
+function OnEndTouch(activator) {
+    if (activator == null || !activator.IsPlayer()) return
+    printl("[${entity}] EndTouch by player")
+}`,
+
+  prop_manip: (entity, _) => `// ╔══════════════════════════════════╗
+// ║  VScript Prop Manipulation        ║
+// ╚══════════════════════════════════╝
+// Requires: prop_dynamic or prop_physics
+
+local TARGET_PROP <- "${entity}"
+
+function OnPostSpawn() {
+    local prop = Entities.FindByName(null, TARGET_PROP)
+    if (prop == null) {
+        printl("ERROR: prop '" + TARGET_PROP + "' not found!")
+        return
+    }
+    
+    // Teleport prop to new position
+    local newPos = prop.GetOrigin() + Vector(0, 0, 64)
+    prop.SetAbsOrigin(newPos)
+    
+    // Change animation
+    prop.AcceptInput("SetAnimation", "open", null, null)
+    
+    // Skin swap
+    // prop.SetSkin(1)
+    
+    printl("[PropManip] Moved " + TARGET_PROP + " to " + newPos)
+}`,
+
+  io_fire: (entity, delay) => `// ╔══════════════════════════════════╗
+// ║  VScript Fire I/O                 ║
+// ╚══════════════════════════════════╝
+
+local DELAY <- ${delay}
+
+function FireCustomIO(targetName, inputName, param) {
+    local target = Entities.FindByName(null, targetName)
+    if (target != null) {
+        EntFireByHandle(target, inputName, param, DELAY, self, self)
+        printl("[${entity}] Fired " + inputName + " on " + targetName)
+    } else {
+        printl("[${entity}] WARNING: target '" + targetName + "' not found")
+    }
+}
+
+function OnPostSpawn() {
+    // Example usage:
+    FireCustomIO("door_01",      "Open",   "")
+    FireCustomIO("light_01",     "TurnOn", "")
+    FireCustomIO("ambient_01",   "PlaySound", "")
+}`,
+
+  player_check: (_, dist) => `// ╔══════════════════════════════════╗
+// ║  VScript Player Distance Check    ║
+// ╚══════════════════════════════════╝
+
+local TRIGGER_DIST <- ${dist}
+local activated <- false
+
+function OnPostSpawn() {
+    self.SetThink(CheckPlayerDistance, "DistCheck", 0.1)
+}
+
+function CheckPlayerDistance() {
+    local player = Entities.FindByClassname(null, "player")
+    if (player == null) return 0.1
+    
+    local myPos  = self.GetAbsOrigin()
+    local plrPos = player.GetAbsOrigin()
+    local delta  = myPos - plrPos
+    local dist   = delta.Length()
+    
+    if (dist <= TRIGGER_DIST && !activated) {
+        activated = true
+        printl("Player within " + TRIGGER_DIST + " units! dist=" + dist)
+        // Fire your logic here
+        EntFire("logic_relay_01", "Trigger", "", 0, null)
+    }
+    
+    if (dist > TRIGGER_DIST + 32) activated = false  // reset hysteresis
+    
+    return 0.1  // check every 100ms
+}`
+};
+
+function generateVScript() {
+  const type = document.getElementById('vscriptType').value;
+  const entity = document.getElementById('vscriptEntity').value;
+  const param = parseFloat(document.getElementById('vscriptParam').value) || 2.5;
+  const fn = VSCRIPT_TEMPLATES[type];
+  if (fn) document.getElementById('vscriptOutput').textContent = fn(entity, param);
+}
+
+function copyVScript() {
+  const text = document.getElementById('vscriptOutput').textContent;
+  navigator.clipboard.writeText(text);
+}
+
+/* ══════════════════════════════════════════════════════
+   VMT VALIDATOR
+══════════════════════════════════════════════════════ */
+const VMT_RULES = [
+  { pattern: /\$alphatest.*1.*\$translucent.*1|\$translucent.*1.*\$alphatest.*1/si,
+    level: 'error', msg: '$alphatest and $translucent are mutually exclusive — pick ONE. Use $alphatest for hard cutout, $translucent for smooth blend.' },
+  { pattern: /\$phong.*1/i, requires: /\$bumpmap/i,
+    level: 'warn', msg: '$phong enabled but no $bumpmap found. Phong highlights require a normal map to look correct.' },
+  { pattern: /\$envmap.*env_cubemap/i, requires: /\$normalmapalphaenvmapmask|\$envmapmask|\$basealphaenvmapmask/i,
+    level: 'warn', msg: '$envmap set but no envmapmask defined. Entire surface will be reflective — add a mask texture.' },
+  { pattern: /\$selfillum.*1/i, reqParam: /\$selfillumtint|\$selfillummask/i,
+    level: 'info', msg: '$selfillum active. Add $selfillumtint "[r g b]" to control glow color.' },
+  { pattern: /LightmappedGeneric/i, conflict: /\$nocull.*1/i,
+    level: 'warn', msg: '$nocull on LightmappedGeneric may cause lightmap issues on double-sided geometry.' },
+  { pattern: /\$basetexture\s+"([^"]+)"/i, fn: (m) => {
+    const path = m[1];
+    if (!path.includes('/')) return { level: 'warn', msg: `Texture path "${path}" has no subdirectory — expected "folder/texture_name"` };
+    return null;
+  }},
+  { pattern: /\$phongexponent\s+"?(\d+)/i, fn: (m) => {
+    const v = parseInt(m[1]);
+    if (v > 500) return { level: 'warn', msg: `$phongexponent "${v}" is very high (>500). Will look like a mirror — intended?` };
+    return null;
+  }},
+  { pattern: /VertexLitGeneric/i,
+    level: 'info', msg: 'VertexLitGeneric shader detected — suitable for props/models. Use LightmappedGeneric for world brushes.' },
+  { pattern: /UnlitGeneric/i,
+    level: 'info', msg: 'UnlitGeneric shader — no lighting calculated. Good for HUD/2D overlays, not for 3D surfaces.' },
+  { pattern: /\$detail\b/i, requires: /\$detailscale/i,
+    level: 'warn', msg: '$detail texture set but no $detailscale defined. Default scale may look wrong — add $detailscale.' },
+];
+
+function validateVMT() {
+  const raw = document.getElementById('vmtInput').value;
+  const report = [];
+
+  // Shader detection
+  const shaderMatch = raw.match(/^"?(\w+)"?\s*\n?\s*\{/m);
+  if (shaderMatch) {
+    report.push({ level: 'ok', line: 1, msg: `Shader: ${shaderMatch[1]}` });
+  } else {
+    report.push({ level: 'error', line: 1, msg: 'No valid shader declaration found. VMT must start with shader name in quotes.' });
+  }
+
+  // Bracket balance
+  const opens = (raw.match(/\{/g) || []).length;
+  const closes = (raw.match(/\}/g) || []).length;
+  if (opens !== closes) {
+    report.push({ level: 'error', line: '?', msg: `Unbalanced braces: ${opens} opening vs ${closes} closing` });
+  } else {
+    report.push({ level: 'ok', line: '?', msg: 'Brace balance: OK' });
+  }
+
+  // Rule checks
+  for (const rule of VMT_RULES) {
+    if (rule.fn) {
+      const m = raw.match(rule.pattern);
+      if (m) {
+        const result = rule.fn(m);
+        if (result) report.push({ level: result.level, line: getLineOf(raw, m[0]), msg: result.msg });
+      }
+    } else if (raw.match(rule.pattern)) {
+      if (rule.requires && !raw.match(rule.requires)) {
+        report.push({ level: rule.level, line: getLineOf(raw, raw.match(rule.pattern)[0]), msg: rule.msg });
+      } else if (rule.conflict && raw.match(rule.conflict)) {
+        report.push({ level: rule.level, line: '?', msg: rule.msg });
+      } else if (!rule.requires && !rule.conflict) {
+        report.push({ level: rule.level, line: getLineOf(raw, raw.match(rule.pattern)[0]), msg: rule.msg });
+      }
+    }
+  }
+
+  // Mutual exclusion: alphatest + translucent
+  if (raw.match(/\$alphatest/i) && raw.match(/\$translucent/i)) {
+    report.push({ level: 'error', line: '?', msg: 'CONFLICT: $alphatest + $translucent used together — undefined behavior in Source renderer!' });
+  }
+
+  const errs = report.filter(r => r.level === 'error').length;
+  const warns = report.filter(r => r.level === 'warn').length;
+  const infos = report.filter(r => r.level === 'ok' || r.level === 'info').length;
+
+  document.getElementById('vmtErrCount').textContent = errs;
+  document.getElementById('vmtWarnCount').textContent = warns;
+  document.getElementById('vmtInfoCount').textContent = infos;
+
+  const list = document.getElementById('vmtReport');
+  list.innerHTML = report.map(r => `
+    <div class="log-item ${r.level === 'error' ? 'error' : r.level === 'warn' ? 'warn' : r.level === 'ok' ? 'ok' : 'info'}">
+      <div class="log-line">L${r.line}</div>
+      <div class="log-msg">${r.msg}</div>
+      <span class="badge badge-${r.level === 'error' ? 'error' : r.level === 'warn' ? 'warn' : 'ok'}">${r.level.toUpperCase()}</span>
+    </div>
+  `).join('');
+}
+
+function getLineOf(text, match) {
+  const idx = text.indexOf(match);
+  if (idx < 0) return '?';
+  return text.substring(0, idx).split('\n').length;
+}
+
+function clearVMT() {
+  document.getElementById('vmtInput').value = '';
+  document.getElementById('vmtReport').innerHTML = '<div class="log-item info"><div class="log-msg">Cleared</div></div>';
+  ['vmtErrCount','vmtWarnCount','vmtInfoCount'].forEach(id => document.getElementById(id).textContent = '—');
+}
+
+const VMT_TEMPLATES_DATA = {
+  basic: `"LightmappedGeneric"\n{\n\t"$basetexture" "concrete/concretewall001a"\n\t"$surfaceprop" "concrete"\n}`,
+  phong: `"VertexLitGeneric"\n{\n\t"$basetexture" "metal/metalwall001a"\n\t"$bumpmap" "metal/metalwall001a_normal"\n\t"$surfaceprop" "metal"\n\t"$phong" "1"\n\t"$phongexponent" "64"\n\t"$phongboost" "1.5"\n\t"$envmap" "env_cubemap"\n\t"$envmapfresnel" "1"\n}`,
+  glass: `"LightmappedGeneric"\n{\n\t"$basetexture" "glass/glasswindow007a"\n\t"$surfaceprop" "glass"\n\t"$translucent" "1"\n\t"$envmap" "env_cubemap"\n\t"$envmaptint" "[.8 .8 .8]"\n\t"$reflectivity" "[0.5 0.5 0.5]"\n}`,
+  glow: `"VertexLitGeneric"\n{\n\t"$basetexture" "props/light_panel01"\n\t"$selfillum" "1"\n\t"$selfillumtint" "[1 0.8 0.4]"\n\t"$surfaceprop" "plastic"\n\t"$additive" "0"\n}`,
+  decal: `"DecalModulate"\n{\n\t"$basetexture" "decals/decal_bloodstain001a"\n\t"$translucent" "1"\n\t"$decal" "1"\n\t"$decalscale" "0.25"\n}`,
+  water: `"Water"\n{\n\t"$basetexture" "nature/water_canal_city01"\n\t"$bumpmap" "nature/water_canal_city_normal"\n\t"$surfaceprop" "water"\n\t"$fogcolor" "[.04 .06 .08]"\n\t"$fogstart" "1.0"\n\t"$fogend" "200.0"\n\t"$abovewater" "1"\n\t"$fogenable" "1"\n\t"$reflectentities" "1"\n\t"$refract" "1"\n}`,
+};
+
+function loadVMTTemplate(type) {
+  document.getElementById('vmtInput').value = VMT_TEMPLATES_DATA[type] || '';
+  validateVMT();
+}
+
+/* ══════════════════════════════════════════════════════
+   SOUNDSCAPE BUILDER
+══════════════════════════════════════════════════════ */
+let ssLayers = [];
+
+function addSSLayer() {
+  const layer = {
+    type: document.getElementById('ssType').value,
+    sound: document.getElementById('ssSound').value,
+    volume: document.getElementById('ssVolume').value,
+    pitch: document.getElementById('ssPitch').value,
+    minInt: document.getElementById('ssMinInt').value,
+    maxInt: document.getElementById('ssMaxInt').value,
+    pos: document.getElementById('ssPos').value,
+  };
+  ssLayers.push(layer);
+  renderSSLayers();
+  buildSoundscape();
+}
+
+function renderSSLayers() {
+  const el = document.getElementById('ssLayers');
+  if (!ssLayers.length) {
+    el.innerHTML = '<div class="log-item info"><div class="log-msg">No layers added yet</div></div>';
+    return;
+  }
+  el.innerHTML = ssLayers.map((l, i) => `
+    <div class="log-item" style="border-left-color:var(--cyan);">
+      <div class="log-msg">
+        <span style="color:var(--accent)">${l.type}</span>
+        <span style="color:var(--text-secondary)"> "${l.sound}"</span>
+        <span style="color:var(--text-dim)"> vol:${l.volume} int:[${l.minInt}-${l.maxInt}]s</span>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="removeSS(${i})">✕</button>
+    </div>
+  `).join('');
+}
+
+function removeSS(i) { ssLayers.splice(i, 1); renderSSLayers(); buildSoundscape(); }
+
+function buildSoundscape() {
+  const name = document.getElementById('ssName').value;
+  const dsp = document.getElementById('ssDsp').value;
+
+  let out = `"${name}"\n{\n\t"dsp_space"\t"${dsp}"\n\n`;
+
+  ssLayers.forEach(l => {
+    out += `\t"${l.type}"\n\t{\n`;
+    out += `\t\t"wave"\t"${l.sound}"\n`;
+    out += `\t\t"volume"\t"${l.volume}"\n`;
+    out += `\t\t"pitch"\t"${l.pitch}"\n`;
+    if (l.type === 'playrandom') {
+      out += `\t\t"time"\t"${l.minInt},${l.maxInt}"\n`;
+    }
+    if (l.pos) out += `\t\t"position"\t"${l.pos}"\n`;
+    out += `\t}\n\n`;
+  });
+
+  out += `}`;
+  document.getElementById('ssOutput').textContent = out;
+}
+
+function copySoundscape() {
+  navigator.clipboard.writeText(document.getElementById('ssOutput').textContent);
+}
+
+/* ══════════════════════════════════════════════════════
+   LIGHTING / COLOR HELPER
+══════════════════════════════════════════════════════ */
+const LIGHT_PRESETS = [
+  { name: 'Overcast Day', hex: '#c8d4e0', intensity: 150, sky: 'sky_overcast01', sun: '150 170 200 150', ambient: '70 80 90 50' },
+  { name: 'Noon Sun', hex: '#fff5d0', intensity: 300, sky: 'sky_day01_01', sun: '255 240 200 300', ambient: '100 110 130 80' },
+  { name: 'Sunset', hex: '#ff7040', intensity: 200, sky: 'sky_sunset01', sun: '255 120 64 200', ambient: '80 50 80 60' },
+  { name: 'Night Moon', hex: '#4060a0', intensity: 50, sky: 'sky_night01_01', sun: '64 80 160 50', ambient: '20 20 40 20' },
+  { name: 'Interior Warm', hex: '#ffb060', intensity: 180, sky: 'sky_black_nofog', sun: '255 176 96 180', ambient: '40 30 20 30' },
+  { name: 'Underground', hex: '#506070', intensity: 80, sky: 'sky_black_nofog', sun: '80 96 112 80', ambient: '30 35 40 20' },
+  { name: 'Stormy', hex: '#8090a0', intensity: 100, sky: 'sky_stormcloud01', sun: '128 144 160 100', ambient: '50 60 70 40' },
+  { name: 'Dawn', hex: '#ffa080', intensity: 160, sky: 'sky_day02_01', sun: '255 160 128 160', ambient: '80 70 90 60' },
+  { name: 'Nuclear/Toxic', hex: '#90e050', intensity: 120, sky: 'sky_cs15_daylight01_hdr', sun: '144 224 80 120', ambient: '40 60 20 30' },
+  { name: 'Cold Arctic', hex: '#b0d0ff', intensity: 180, sky: 'sky_day01_08', sun: '176 208 255 180', ambient: '80 90 110 60' },
+];
+
+function hexToRGB(hex) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return [r,g,b];
+}
+
+function updateLightColor() {
+  const hex = document.getElementById('lightColor').value;
+  const intensity = parseInt(document.getElementById('lightIntensity').value);
+  document.getElementById('lightIntVal').textContent = intensity;
+  const [r,g,b] = hexToRGB(hex);
+  document.getElementById('lightOutput').textContent = `${r} ${g} ${b} ${intensity}`;
+  document.getElementById('lightHDROutput').textContent = `${r} ${g} ${b} ${intensity} ${r} ${g} ${b} ${intensity}`;
+  document.getElementById('lightPreview').style.background = hex;
+}
+
+function buildPresets() {
+  const container = document.getElementById('lightPresets');
+  container.innerHTML = LIGHT_PRESETS.map((p, i) => `
+    <div class="preset-swatch" style="background:${p.hex};position:relative;" title="${p.name}" onclick="selectPreset(${i})">
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);font-family:var(--font-mono);font-size:7px;color:#fff;text-align:center;padding:2px;letter-spacing:0.5px;overflow:hidden;">${p.name.split(' ')[0]}</div>
+    </div>
+  `).join('');
+}
+
+function selectPreset(i) {
+  const p = LIGHT_PRESETS[i];
+  document.getElementById('lightColor').value = p.hex;
+  document.getElementById('lightIntensity').value = p.intensity;
+  updateLightColor();
+  document.getElementById('presetOutput').textContent =
+`// Preset: ${p.name}
+// light / light_spot color:
+"_light" "${p.sun}"
+// env_sun color:
+"rendercolor" "${hexToRGB(p.hex).join(' ')}"
+// Ambient override (light_environment):
+"_ambient" "${p.ambient}"`;
+  document.getElementById('presetSky').textContent =
+`// Skybox:
+"skyname" "${p.sky}"
+// env_sun pitch: -30 to -70
+// env_sun angles: match map sun dir
+// light_environment angles: match above`;
+}
+
+/* ══════════════════════════════════════════════════════
+   COMPILER LOG PARSER
+══════════════════════════════════════════════════════ */
+const LOG_PATTERNS = [
+  { regex: /leak/i,                       level: 'error', label: 'MAP LEAK', hint: 'The map has a leak! Place a entity inside your sealed space. Use Map → Load Pointfile to see the leak line.' },
+  { regex: /Leaf portals saw into solid/i, level: 'error', label: 'T-JUNCTION / SEAL', hint: 'Overlapping geometry or T-junctions near a leak. Check for off-grid brushes.' },
+  { regex: /node without a volume/i,       level: 'error', label: 'NULL VOLUME', hint: 'A BSP node has no volume. May indicate degenerate brush (zero-area face).' },
+  { regex: /displacement.*non-world/i,     level: 'error', label: 'DISPLACEMENT', hint: 'Displacement on a non-world brush face. Only worldspawn brushes can have displacements.' },
+  { regex: /t-junction/i,                  level: 'warn',  label: 'T-JUNCTION', hint: 'T-junction found. Can cause lightmap seams. Align brush edges to grid.' },
+  { regex: /degenerate/i,                  level: 'warn',  label: 'DEGENERATE', hint: 'Degenerate face/plane detected. Likely a zero-area polygon or co-planar points.' },
+  { regex: /invalid.*material|material.*not found/i, level: 'warn', label: 'MISSING TEXTURE', hint: 'Texture reference not found. Check path in VMT and ensure file exists in mod folder.' },
+  { regex: /too many.*vertices|vertex.*overflow/i,   level: 'error', label: 'VERTEX OVERFLOW', hint: 'Too many vertices in a single face. Split large brushes or use func_detail.' },
+  { regex: /vis cluster.*too large/i,      level: 'warn',  label: 'VIS CLUSTER', hint: 'VIS cluster too large. Add more hint brushes to split visibility regions.' },
+  { regex: /WARNING.*no.*light/i,          level: 'warn',  label: 'NO LIGHT', hint: 'No light entities in scene or area is not lit. Add light/light_spot/light_environment.' },
+  { regex: /Compiling.*vbsp|Compiling.*vvis|Compiling.*vrad/i, level: 'info', label: 'STAGE', hint: null },
+  { regex: /elapsed time/i,               level: 'info',  label: 'TIMING', hint: null },
+  { regex: /(\d+)\s+faces/i,              level: 'info',  label: 'FACE COUNT', hint: null },
+  { regex: /error|Error|ERROR/,           level: 'error', label: 'GENERIC ERROR', hint: 'Check surrounding context for more details.' },
+];
+
+function parseLog() {
+  const raw = document.getElementById('logInput').value;
+  const lines = raw.split('\n');
+  const results = [];
+  let errCount = 0, warnCount = 0, infoCount = 0;
+
+  lines.forEach((line, idx) => {
+    const lineNum = idx + 1;
+    const trimmed = line.trim();
+    if (!trimmed) return;
+
+    for (const pat of LOG_PATTERNS) {
+      if (pat.regex.test(trimmed)) {
+        results.push({ level: pat.level, label: pat.label, line: lineNum, text: trimmed, hint: pat.hint });
+        if (pat.level === 'error') errCount++;
+        else if (pat.level === 'warn') warnCount++;
+        else infoCount++;
+        break;
+      }
+    }
+  });
+
+  document.getElementById('logErrors').textContent = errCount;
+  document.getElementById('logWarns').textContent = warnCount;
+  document.getElementById('logInfos').textContent = infoCount;
+  document.getElementById('logLines').textContent = lines.length;
+
+  const report = document.getElementById('logReport');
+  if (!results.length) {
+    report.innerHTML = '<div class="log-item ok"><div class="log-msg">✓ No critical issues found in log</div></div>';
+    return;
+  }
+
+  report.innerHTML = results.map(r => `
+    <div class="log-item ${r.level}">
+      <div class="log-line">L${r.line}</div>
+      <div class="log-msg">
+        <div style="font-weight:700;margin-bottom:3px;">${r.text}</div>
+        ${r.hint ? `<div style="color:var(--text-secondary);font-size:10px;margin-top:2px;">▶ ${r.hint}</div>` : ''}
+      </div>
+      <span class="badge badge-${r.level === 'error' ? 'error' : r.level === 'warn' ? 'warn' : 'info'}">${r.label}</span>
+    </div>
+  `).join('');
+}
+
+/* ══════════════════════════════════════════════════════
+   ANTI-LAG CHECKLIST
+══════════════════════════════════════════════════════ */
+const CHECKLIST_ITEMS = [
+  { title: 'Use func_detail for non-structural geometry', desc: 'Convert trim, props-brushes, and decorative details to func_detail. This prevents them from being included in BSP splits, dramatically reducing compile time and VIS leaf count.', priority: 'critical' },
+  { title: 'Place Hint brushes to guide VIS cuts', desc: 'Add toolshint/toolsskip brushes perpendicular to sightlines at doorways and corridors. This forces the VIS compiler to create efficient portals. Reduces overdraw significantly.', priority: 'critical' },
+  { title: 'Seal all map leaks before VIS', desc: 'A leaking map skips VIS entirely — every entity and prop is rendered at all times. Fix the leak first (use pointfile).', priority: 'critical' },
+  { title: 'Use areaportals on all doors/windows', desc: 'func_areaportal linked to a door entity will cull entire rooms when closed. Essential for indoor maps. Place as thin as possible in the doorframe.', priority: 'high' },
+  { title: 'Apply occluders for large props', desc: 'func_occluder placed behind walls blocks rendering of objects behind it. Use on thick columns, large walls, and interior dividers.', priority: 'high' },
+  { title: 'Consolidate overlapping brushes', desc: 'Overlapping coplanar faces cause Z-fighting and add unnecessary geometry. Merge brushes where possible.', priority: 'high' },
+  { title: 'Limit prop_physics count', desc: 'Each prop_physics entity has a collision model computed per frame. Keep under 50 per visible area. Use prop_physics_multiplayer for better network performance.', priority: 'medium' },
+  { title: 'Use env_cubemap for reflections', desc: 'Place env_cubemap entities near reflective surfaces. Without them, Source uses a default fallback cubemap resulting in incorrect reflections.', priority: 'medium' },
+  { title: 'Optimize displacement faces', desc: 'Set displacement power to 2 for distant terrain, 3 for mid-range, 4 only for high-detail close areas. Power 4 = 256 faces per displacement.', priority: 'medium' },
+  { title: 'Check entity count (keep under 2048)', desc: 'Source engine has a hard limit of 2048 entities by default. Use func_detail instead of brush entities where possible. Monitor with nav_edit.', priority: 'medium' },
+  { title: 'Use nodraw on hidden faces', desc: 'Apply tools/toolsnodraw to all brush faces that are never visible. This removes them from rendering calculations entirely.', priority: 'low' },
+  { title: 'Split large open areas with rooms', desc: 'Large open areas with no occlusion will render everything simultaneously. Consider adding buildings, terrain features or hills to break sightlines.', priority: 'low' },
+];
+
+let checkStates = {};
+
+function buildChecklist() {
+  const container = document.getElementById('antiLagList');
+  container.innerHTML = CHECKLIST_ITEMS.map((item, i) => {
+    const colors = { critical: 'var(--red)', high: 'var(--accent)', medium: 'var(--yellow)', low: 'var(--blue)' };
+    return `
+      <div class="check-item ${checkStates[i] ? 'done' : ''}" onclick="toggleCheck(${i})" id="check-${i}">
+        <div class="check-box">${checkStates[i] ? '✓' : ''}</div>
+        <div style="flex:1">
+          <div class="check-title">${item.title}</div>
+          <div class="check-desc">${item.desc}</div>
+        </div>
+        <span class="badge" style="background:${colors[item.priority]}22;color:${colors[item.priority]};border:1px solid ${colors[item.priority]}44;flex-shrink:0;">${item.priority.toUpperCase()}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleCheck(i) {
+  checkStates[i] = !checkStates[i];
+  const el = document.getElementById(`check-${i}`);
+  el.classList.toggle('done');
+  el.querySelector('.check-box').textContent = checkStates[i] ? '✓' : '';
+}
+
+/* ══════════════════════════════════════════════════════
+   PREFAB CLIPBOARD
+══════════════════════════════════════════════════════ */
+const PREFABS = [
+  {
+    name: 'Detail Staircase', icon: '◰',
+    desc: 'Modular staircase: 8 steps, 16u rise, 16u run. Ready for func_detail conversion.',
+    code: `// PREFAB: Staircase (8 steps, 128u wide)\n// Origin: 0 0 0 | Steps: 8 | Rise: 16u | Run: 16u\n// Place in Hammer++, then convert to func_detail\n\nworld\n{\n\t"classname" "worldspawn"\n\tsolid { "id" "1"\n\t\tside { "id" "1" "plane" "(0 0 0) (128 0 0) (128 16 0)" "material" "TOOLS/TOOLSNODRAW" "uaxis" "[1 0 0 0] 0.25" "vaxis" "[0 -1 0 0] 0.25" }\n\t\t// ... (expand for full 8 steps)\n\t}\n}`,
+  },
+  {
+    name: 'Window Frame Brush', icon: '⬜',
+    desc: '4-brush window frame with arch opening. Toolsnodraw on back faces.',
+    code: `// PREFAB: Window Frame 128x128\n// 4 brushes: top, bottom, left, right\n// Default texture: concrete/wall\n\nworld {\n\t"classname" "worldspawn"\n\t// Top beam\n\tsolid { "id" "2"\n\t\tside { "id" "10" "plane" "(0 112 0) (128 112 0) (128 128 0)" "material" "CONCRETE/CONCRETEWALL001A" "uaxis" "[1 0 0 0] 0.25" "vaxis" "[0 0 -1 0] 0.25" }\n\t}\n}`,
+  },
+  {
+    name: 'func_door Template', icon: '⬡',
+    desc: 'Sliding door entity with proper I/O connections and speed settings.',
+    code: `// PREFAB: func_door (sliding)\nentity\n{\n\t"id" "100"\n\t"classname" "func_door"\n\t"origin" "0 0 0"\n\t"angles" "0 0 0"\n\t"movedir" "0 90 0"\n\t"speed" "100"\n\t"wait" "4"\n\t"lip" "4"\n\t"rendermode" "0"\n\t"spawnflags" "0"\n\t"health" "0"\n\t"sounds" "1"\n\t"noise1" "doors/door_metal_thin_close1.wav"\n\tconnections\n\t{\n\t\t"OnFullyOpen" "relay_door_open,Trigger,,0,-1"\n\t\t"OnFullyClosed" "relay_door_closed,Trigger,,0,-1"\n\t}\n}`,
+  },
+  {
+    name: 'Trigger Teleport', icon: '⟁',
+    desc: 'trigger_teleport + info_teleport_destination pair. Complete setup.',
+    code: `// PREFAB: trigger_teleport + destination\nentity\n{\n\t"id" "200"\n\t"classname" "trigger_teleport"\n\t"target" "teleport_dest_01"\n\t"landmark" ""\n\t"spawnflags" "1"\n\t// Brush must be a trigger volume\n}\nentity\n{\n\t"id" "201"\n\t"classname" "info_teleport_destination"\n\t"targetname" "teleport_dest_01"\n\t"origin" "256 256 64"\n\t"angles" "0 180 0"\n}`,
+  },
+  {
+    name: 'Ambient Light Setup', icon: '☀',
+    desc: 'light_environment + shadow_control for outdoor maps. HDR-ready.',
+    code: `// PREFAB: Outdoor Light Setup (HDR-ready)\nentity\n{\n\t"id" "300"\n\t"classname" "light_environment"\n\t"origin" "0 0 512"\n\t"angles" "-45 45 0"\n\t"pitch" "-45"\n\t"_light" "255 240 200 300"\n\t"_ambient" "100 110 130 80"\n\t"_lightHDR" "255 240 200 300"\n\t"_ambientHDR" "100 110 130 80"\n\t"_lightshadow" "1"\n\t"SunSpreadAngle" "5"\n}\nentity\n{\n\t"id" "301"\n\t"classname" "shadow_control"\n\t"origin" "0 0 0"\n\t"angles" "-45 45 0"\n\t"color" "128 128 128"\n\t"distance" "75"\n\t"enableshadows" "1"\n}`,
+  },
+  {
+    name: 'Soundscape Trigger', icon: '♪',
+    desc: 'trigger_soundscape volume ready for soundscape name assignment.',
+    code: `// PREFAB: trigger_soundscape\n// Place brush volume where soundscape should play\nentity\n{\n\t"id" "400"\n\t"classname" "trigger_soundscape"\n\t"soundscape" "outdoor.city.day"\n\t// Change soundscape name above to match your soundscapes.txt\n\t// Volume must be a brush tied to this entity\n}`,
+  },
+  {
+    name: 'Point Spotlight', icon: '◉',
+    desc: 'light_spot with cone + inner cone, full property set for cinematic lighting.',
+    code: `// PREFAB: light_spot (cinematic)\nentity\n{\n\t"id" "500"\n\t"classname" "light_spot"\n\t"origin" "0 0 256"\n\t"angles" "-90 0 0"\n\t"pitch" "-90"\n\t"_light" "255 200 128 300"\n\t"_lightHDR" "255 200 128 300"\n\t"_cone" "45"\n\t"_inner_cone" "30"\n\t"_exponent" "1"\n\t"_hardfalloff" "0"\n\t"style" "0"\n\t"pattern" ""\n\t"_castentityshadows" "1"\n}`,
+  },
+  {
+    name: 'hint/skip Portal', icon: '⬛',
+    desc: 'Optimized hint+skip brush pair for VIS splitting. Copy and place at doorways.',
+    code: `// PREFAB: Hint/Skip VIS Portal\n// Place this thin brush at doorways/corridors\n// The hint face faces the corridor, skip faces the rest\n// CRITICAL: Must be sealed by surrounding geometry\n\nworld\n{\n\t"classname" "worldspawn"\n\tsolid\n\t{\n\t\t"id" "600"\n\t\t// Face 1: HINT (faces into corridor)\n\t\tside { "id" "601" "plane" "(0 0 0) (128 0 0) (128 0 128)" "material" "TOOLS/TOOLSHINT" "uaxis" "[0 0 -1 0] 0.25" "vaxis" "[0 -1 0 0] 0.25" }\n\t\t// All other faces: SKIP\n\t\tside { "id" "602" "plane" "(0 2 128) (128 2 128) (128 2 0)" "material" "TOOLS/TOOLSSKIP" "uaxis" "[1 0 0 0] 0.25" "vaxis" "[0 0 -1 0] 0.25" }\n\t}\n}`,
+  },
+];
+
+function buildPrefabGrid() {
+  const grid = document.getElementById('prefabGrid');
+  grid.innerHTML = PREFABS.map((p, i) => `
+    <div class="panel accent-left" style="display:flex;flex-direction:column;">
+      <div class="panel-title">${p.icon} ${p.name}</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;flex:1;line-height:1.6;">${p.desc}</div>
+      <div class="code-output" style="font-size:10px;max-height:120px;margin-bottom:12px;">${escapeHTML(p.code)}</div>
+      <button class="btn btn-primary" onclick="copyPrefab(${i}, this)">⎘ Copy VMF Code</button>
+    </div>
+  `).join('');
+}
+
+function escapeHTML(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function copyPrefab(i, btn) {
+  navigator.clipboard.writeText(PREFABS[i].code).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied to Clipboard!';
+    btn.style.background = 'var(--green)';
+    btn.style.color = '#000';
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.style.background = '';
+      btn.style.color = '';
+    }, 1500);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   TAB NAVIGATION
+══════════════════════════════════════════════════════ */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  updateGeomUI();
+  generateVScript();
+  buildPresets();
+  updateLightColor();
+  buildChecklist();
+  buildPrefabGrid();
+  previewGeometry();
+
+  // Auto-generate sample IO
+  addIOConnection();
+  document.getElementById('ioSource').value = 'button_door';
+  document.getElementById('ioTarget').value = 'func_door_main';
+
+  // Auto-generate VScript
+  generateVScript();
+});
+</script>
+</body>
+</html>
